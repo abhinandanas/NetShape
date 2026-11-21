@@ -1,0 +1,232 @@
+/* HostelNet QoS — Dark NOC Dashboard Styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg-primary: #0F1115;
+  --bg-card: #181B22;
+  --bg-card-sub: #1F242D;
+  --border-color: #2A2F3A;
+  --border-hover: #3A4252;
+  --text-main: #F1F5F9;
+  --text-muted: #94A3B8;
+  --text-dim: #64748B;
+  
+  /* Functional Palette */
+  --c-zoom: #38BDF8;      /* Sky Blue */
+  --c-ipl: #F59E0B;       /* Warm Amber */
+  --c-steam: #F97316;     /* Coral Orange */
+  --c-healthy: #10B981;   /* Emerald */
+  --c-drop: #EF4444;      /* Crimson Red */
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
+
+.mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Matte NOC Surfaces - strictly zero glassmorphism */
+.noc-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+}
+
+.noc-card-sub {
+  background-color: var(--bg-card-sub);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: #2A2F3A;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3A4252;
+}
+
+/* Buttons */
+.btn-noc {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  font-size: 0.8125rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-card-sub);
+  color: var(--text-main);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
+  user-select: none;
+}
+.btn-noc:hover {
+  background-color: #272E3B;
+  border-color: var(--border-hover);
+}
+.btn-noc:active {
+  transform: translateY(1px);
+}
+
+.btn-primary {
+  background-color: #10B981;
+  border-color: #059669;
+  color: #064E3B;
+  font-weight: 600;
+}
+.btn-primary:hover {
+  background-color: #059669;
+  border-color: #047857;
+  color: #FFFFFF;
+}
+
+.btn-danger {
+  background-color: #EF4444;
+  border-color: #DC2626;
+  color: #FFFFFF;
+}
+.btn-danger:hover {
+  background-color: #DC2626;
+}
+
+/* Custom Range Slider */
+input[type=range] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  background: #2A2F3A;
+  border-radius: 3px;
+  outline: none;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #10B981;
+  cursor: pointer;
+  border: 2px solid #0F1115;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+input[type=range]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #10B981;
+  cursor: pointer;
+  border: 2px solid #0F1115;
+}
+
+/* Toggle Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 22px;
+}
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #2A2F3A;
+  transition: 0.2s;
+  border-radius: 22px;
+  border: 1px solid #3A4252;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background-color: #94A3B8;
+  transition: 0.2s;
+  border-radius: 50%;
+}
+input:checked + .slider {
+  background-color: #10B981;
+  border-color: #059669;
+}
+input:checked + .slider:before {
+  transform: translateX(22px);
+  background-color: #FFFFFF;
+}
+
+/* Specific Shaper Master Toggle */
+.master-switch {
+  width: 52px;
+  height: 26px;
+}
+.master-switch .slider:before {
+  height: 20px;
+  width: 20px;
+  left: 2px;
+  bottom: 2px;
+}
+.master-switch input:checked + .slider:before {
+  transform: translateX(26px);
+}
+.master-switch input:not(:checked) + .slider {
+  background-color: #7F1D1D;
+  border-color: #991B1B;
+}
+
+/* Device Indicator Dots */
+.dot-zoom { background-color: var(--c-zoom); }
+.dot-ipl { background-color: var(--c-ipl); }
+.dot-steam { background-color: var(--c-steam); }
+.dot-healthy { background-color: var(--c-healthy); }
+.dot-drop { background-color: var(--c-drop); }
+
+/* Animation Canvas Container */
+#canvas-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 380px;
+  background-color: #0B0D11;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+#trafficCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
