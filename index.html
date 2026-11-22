@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HostelNet QoS — Leaky Bucket Traffic Shaping Simulator</title>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+
+  <!-- App styles -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════════════════════════════
+       BAND 1 — HEADER BAR
+       Title | Demo Presets | Shaper Toggle | Reset
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <header id="header">
+    <h1>HostelNet <span>QoS</span></h1>
+    <div class="header-sep"></div>
+
+    <!-- Demo Presets -->
+    <button class="preset-btn" data-preset="1" title="Only Zoom running, Leaky Bucket ON">1 · Zoom Only</button>
+    <button class="preset-btn" data-preset="2" title="All sources ON, Shaper OFF — demonstrates bufferbloat">2 · Trigger Bufferbloat</button>
+    <button class="preset-btn" data-preset="3" title="All sources ON, Leaky Bucket ON — QoS protected">3 · Activate Leaky Bucket</button>
+
+    <div class="header-sep"></div>
+
+    <!-- Shaper Toggle -->
+    <div class="shaper-area">
+      <label for="shaperToggle">Leaky Bucket Shaper</label>
+      <label class="toggle-switch">
+        <input type="checkbox" id="shaperToggle" />
+        <span class="toggle-track"></span>
+      </label>
+      <span class="toggle-label label-off" id="shaperLabel">OFF (Bufferbloat)</span>
+    </div>
+
+    <!-- Reset -->
+    <button id="resetBtn">↺ Reset</button>
+  </header>
+
+
+  <!-- ══════════════════════════════════════════════════════════════════════════
+       BAND 2 — MAIN INTERACTIVE STAGE
+       Left: source controls | Center: Canvas | Right: Zoom badge
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <main id="main-stage">
+
+    <!-- Left Controls Panel -->
+    <aside id="controls-panel">
+      <div class="panel-title">Traffic Sources</div>
+
+      <!-- Zoom Call -->
+      <div class="source-card">
+        <div class="source-header">
+          <span class="source-dot" style="background:#1D4ED8;"></span>
+          <span class="source-name">Zoom Call</span>
+          <label class="toggle-switch" title="Toggle Zoom Call">
+            <input type="checkbox" id="toggle_zoom" />
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+        <div class="source-meta">Steady · 1.5 pkt/s · 200B UDP</div>
+        <div class="source-actions">
+          <button class="burst-btn" id="burst_zoom">⚡ Burst</button>
+        </div>
+      </div>
+
+      <!-- 4K IPL Stream -->
+      <div class="source-card">
+        <div class="source-header">
+          <span class="source-dot" style="background:#B45309;"></span>
+          <span class="source-name">4K IPL Stream</span>
+          <label class="toggle-switch" title="Toggle IPL Stream">
+            <input type="checkbox" id="toggle_ipl" />
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+        <div class="source-meta">Bursty · 4.0 pkt/s · ~800B</div>
+        <div class="source-actions">
+          <button class="burst-btn" id="burst_ipl">⚡ Burst</button>
+        </div>
+      </div>
+
+      <!-- Steam Download -->
+      <div class="source-card">
+        <div class="source-header">
+          <span class="source-dot" style="background:#C2410C;"></span>
+          <span class="source-name">Steam Download</span>
+          <label class="toggle-switch" title="Toggle Steam Download">
+            <input type="checkbox" id="toggle_steam" />
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+        <div class="source-meta">Surge · 10.0 pkt/s · 1500B TCP</div>
+        <div class="source-actions">
+          <button class="burst-btn" id="burst_steam">⚡ Burst</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Canvas Visualizer -->
+    <div id="canvas-area">
+      <canvas id="mainCanvas"></canvas>
+
+      <!-- Zoom Health Badge (top-right of canvas) -->
+      <div id="zoomBadge" class="zoom-badge badge-smooth">
+        <span class="badge-label">Zoom Health</span>
+        <span id="badgeStatus">SMOOTH</span>
+        <span id="badgeLatency">8 ms</span>
+      </div>
+    </div>
+
+  </main>
+
+
+  <!-- ══════════════════════════════════════════════════════════════════════════
+       BAND 3 — BOTTOM TELEMETRY & GRAPH STRIP
+       Metrics | Sliders | Chart
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <footer id="bottom-strip">
+
+    <!-- Live Metrics -->
+    <div class="metric-cell">
+      <div class="metric-label">Transmitted</div>
+      <div class="metric-value" id="metTransmitted">0</div>
+      <div class="metric-sub">pkts</div>
+    </div>
+
+    <div class="metric-cell">
+      <div class="metric-label">Buffered</div>
+      <div class="metric-value" id="metBuffered">0</div>
+      <div class="metric-sub">pkts</div>
+    </div>
+
+    <div class="metric-cell">
+      <div class="metric-label">Dropped</div>
+      <div class="metric-value" id="metDropped">0</div>
+      <div class="metric-sub">pkts</div>
+    </div>
+
+    <div class="metric-cell">
+      <div class="metric-label">Drop Rate</div>
+      <div class="metric-value" id="metDropRate">0.0%</div>
+      <div class="metric-sub">&nbsp;</div>
+    </div>
+
+    <div class="metric-cell">
+      <div class="metric-label">Zoom Latency</div>
+      <div class="metric-value" id="metLatency">0 ms</div>
+      <div class="metric-sub">&nbsp;</div>
+    </div>
+
+    <div class="metric-cell" style="min-width:90px;">
+      <div class="metric-label">Congestion</div>
+      <span id="congestionLabel" style="font:600 11px var(--font-mono); color:var(--healthy);">HEALTHY</span>
+    </div>
+
+    <!-- Sliders -->
+    <div class="sliders-section">
+      <div class="slider-row">
+        <label for="capacitySlider">Bucket Capacity</label>
+        <input type="range" id="capacitySlider" min="5" max="30" step="1" value="15" />
+        <span class="slider-display" id="capacityDisplay">15</span>
+        <span style="font:400 9px var(--font-ui);color:var(--text-muted);">pkts</span>
+      </div>
+      <div class="slider-row">
+        <label for="leakRateSlider">Leak Rate</label>
+        <input type="range" id="leakRateSlider" min="1" max="15" step="0.5" value="5" />
+        <span class="slider-display" id="leakRateDisplay">5.0</span>
+        <span style="font:400 9px var(--font-ui);color:var(--text-muted);">pkt/s</span>
+      </div>
+    </div>
+
+    <!-- Chart.js Rate Graph -->
+    <div class="chart-section">
+      <div class="chart-label">Traffic Rate — Last 30 s</div>
+      <canvas id="rateChart"></canvas>
+    </div>
+
+  </footer>
+
+
+  <!-- Scripts (order matters: engine → canvas → app) -->
+  <script src="engine.js"></script>
+  <script src="canvas.js"></script>
+  <script src="app.js"></script>
+
+</body>
+</html>
