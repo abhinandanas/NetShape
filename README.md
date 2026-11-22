@@ -75,35 +75,4 @@ NET/
 
 ---
 
-## 3-Minute Viva Script
-
-**Q: What problem does this project solve?**
-A: College hostel Wi-Fi bufferbloat — a single heavy Steam download or IPL stream can fill the router's queue, causing Zoom call latency to spike from 15 ms to over 300 ms, breaking voice and video.
-
-**Q: How does the Leaky Bucket algorithm fix this?**
-A: It places a fixed-size FIFO buffer (the "bucket") between incoming traffic and the ISP link. Packets enter the bucket at any rate but leave at a fixed, controlled leak rate. If the bucket overflows, excess packets are dropped early at the edge rather than congesting the shared router queue.
-
-**Q: What is the difference between Leaky Bucket and Token Bucket?**
-A: Leaky Bucket enforces a strictly constant output rate (CBR). Token Bucket allows short bursts up to a token accumulation limit — output rate can momentarily exceed the average. Leaky Bucket is better for real-time traffic shaping where jitter must be minimised.
-
-**Q: How does this simulation differ from a real router implementation?**
-A: A real router runs the leaky bucket in hardware using a timer interrupt and a circular packet buffer in memory. This simulation uses a JavaScript `requestAnimationFrame` loop (60fps, ~16ms tick) with a fractional accumulator for sub-tick precision. The core algorithm is identical.
-
-**Q: What metrics prove Leaky Bucket works?**
-A: Drop Rate drops from ~58% (Bypass mode) to 0% (Leaky Bucket, Capacity 15, Leak Rate 5). Zoom latency drops from 180–480 ms to 8–18 ms. Outgoing rate becomes flat (CBR) instead of bursty.
-
----
-
-## Color Legend
-
-| Color | Meaning |
-|---|---|
-| Deep Royal Blue `#1D4ED8` | Zoom Call packets |
-| Matte Amber `#B45309` | 4K IPL Stream packets |
-| Terracotta `#C2410C` | 50GB Steam Download packets |
-| Forest Green `#15803D` | Healthy / transmitted output |
-| Deep Crimson `#B91C1C` | Dropped / bufferbloat / congestion |
-
----
-
-*Built for DCN Mini-Project AY 2025–26. Sahyadri College of Engineering & Management, Mangaluru.*
+*Built for DCN Mini-Project AY 2026–27. Sahyadri College of Engineering & Management, Mangaluru.*
